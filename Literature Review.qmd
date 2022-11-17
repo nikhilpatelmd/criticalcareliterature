@@ -1,0 +1,72 @@
+---
+title: "Critical Care Literature"
+author: "Nikhil Patel"
+date: "`r Sys.Date()`"
+
+format:
+  html: 
+    toc: true
+    toc-location: left
+    toc-title: "Contents"
+    css: styles.css
+execute: 
+  echo: false
+  output: false
+
+---
+
+
+```{r}
+
+library(easyPubMed)
+library(tidyverse)
+library(rvest)
+library(polite)
+library(reactable)
+library(xml2)
+
+# API Key
+#set_entrez_key("f8e38f16c2da397d71aa8be73622ec47e508")
+#Sys.getenv("ENTREZ_KEY")
+
+
+
+```
+
+## New England Journal of Medicine
+
+```{r NEJM}
+
+polite_url <- "https://www.nejm.org/medical-articles/original-article"
+
+session <- bow(polite_url,
+               user_agent = "Nikhil's Literature Review")
+
+session
+
+# Read an HTML page
+nejm <- read_html("https://www.nejm.org/medical-articles/original-article")
+
+# Find All Original Articles
+nejmlist <- nejm %>%
+  html_nodes(".os-search-results_item")
+
+xml_attrs(xml_child(nejmlist[[1]], 1))[["value"]] # DOI
+xml_attrs(xml_child(nejmlist[[1]], 2))[["value"]] # Author
+xml_attrs(xml_child(nejmlist[[1]], 4))[["value"]] # ePub Date
+xml_attrs(xml_child(nejmlist[[1]], 4))[["value"]] # Article Title
+
+for(i in letters[1:20]){
+  print(i)
+}
+
+data_path <- ""
+files <- list.files(data_path)
+data <- list()
+for(i in files){
+  data[[i]] <- read.csv(i, stringsAsFactors = F)
+}
+data <- combine(data)
+
+```
+
